@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>upload</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="main">
+        <h1>Upload Your Images</h1>
+        <form action="/api/upload" method="post" enctype="multipart/form-data" style="display:none;">
+            <p>
+                <!-- multiple ie 10+ -->
+                <input type="file" name="images" multiple="multiple">
+            </p>
+            <input type="submit" value="上传">
+        </form>
+        <input id="upload" type="file" name="images" multiple="multiple">
+        <!-- <div id="upload" class="upload"></div> -->
+        <div class="image-list" id="image-list">
+        </div>
+    </div>
+    <script src="build/webupload.js"></script>
+    <script>
+    new Webupload({
+        //触发上传的元素
+        el: "upload",
+        //上传地址
+        url: "/api/upload",
+        //自定义数据（例如token,可选）
+        data: {
+            token: Date.now().toString(16)
+        },
+        //限制上传个数（可选，默认最多上传9个文件）
+        limit: 2,
+        //限制上传类型（可选）
+        ext: ["png"],
+        //单个文件装载完成（可选）
+        loadend: function(source, b) {
+            //console.log(source)
+            console.log(b)
+            var list = document.getElementById("image-list"),
+                li = document.createElement("li"),
+                img = document.createElement("img");
+            img.src = source;
+            li.appendChild(img);
+            list.appendChild(li);
+        },
+        //错误处理消息（可选）
+        error:function(msg){
+            console.log(msg);
+        }
+    });
+    </script>
+</body>
+
+</html>
