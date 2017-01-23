@@ -1,77 +1,70 @@
 # webupload
 
-只是一个粗糙的版本，目前尚不成熟，仅支持现代浏览器
+只是一个粗糙的版本，目前尚不成熟。
 
-## 支持
+## Browser support
+IE 9 +
+
+## 功能
 
 * 多选
 * 无刷新
+* 自定义请求数据
 * 上传预览
-* <del>上传进度</del>
-* <del>文件限制</del>
+* 上传进度
+* 文件类型限制
+* <del>删除</del>
 * <del>裁剪</del>
-* <del>跨域</del>
+* 跨域
+* <del>断点续传</del>
 * <del>向前兼容</del>
 
-## 使用方法：
-
-### 方法一：
-
-#### 安装
+### 安装
 
     npm install webupload
 
+## 使用方法：
+
+```html
+<input id="upload" type="file" name="images" multiple="multiple">
+```
+
 在支持本地打包的环境使用：
 
-    require("webupload");
-    new Webupload({
-        //触发上传的元素
-        el: "upload",
-        //上传地址
-        url: "/api/upload",
-        //单个文件装载完成
-        loadend: function(source, b) {
-            console.log(source)
-            console.log(b)
-            var list = document.getElementById("image-list"),
-                li = document.createElement("li"),
-                img = document.createElement("img");
-            img.src = source;
-            li.appendChild(img);
-            list.appendChild(li);
-        }
-    });
-   
+```js
+import {Webupload} form "webupload";
+new Webupload({
+    //触发上传的元素
+    el: "upload",
+    //上传地址
+    url: "/api/upload",
+    //自定义数据（例如token,可选）
+    data: {
+        token: Date.now().toString(16)
+    },
+    //限制上传个数（可选，默认最多上传9个文件）
+    limit: 2,
+    //限制上传类型（可选）
+    ext: ["png"],
+    //单个文件装载完成（可选）
+    loadend: function(source, b) {
+        //console.log(source)
+        console.log(b)
+    },
+    //错误处理消息（可选）
+    error:function(msg){
+        console.log(msg);
+    }
+});
+```
 
-### 方法二：
+## 跨域 
 
-在html中引入：
+需要让接口开发人员增加http头，其原理可参考我之前的文章：<a href="https://www.w3cmm.com/ajax/cors.html">CORS跨源资源共享</a>
 
-    <input id="upload" type="file" name="images" multiple="multiple">
-    <div class="image-list" id="image-list"></div>
+    Access-Control-Allow-Origin: *
 
-    <script src="build/webupload.js"></script>
-    <script>
-    new Webupload({
-        //触发上传的元素
-        el: "upload",
-        //上传地址
-        url: "/api/upload",
-        //单个文件装载完成
-        loadend: function(source, b) {
-            console.log(source)
-            console.log(b)
-            var list = document.getElementById("image-list"),
-                li = document.createElement("li"),
-                img = document.createElement("img");
-            img.src = source;
-            li.appendChild(img);
-            list.appendChild(li);
-        }
-    });
-    </script>
-
-
+## demo
 查看demo，需要先运行一个服务来接受上传图片
 
     npm run server

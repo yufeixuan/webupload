@@ -1,32 +1,70 @@
 var Init = require("./init.js");
 require("./formData.js");
-
+var webuploadID = 0;
 function Webupload(options) {
     this.options = {
         el: "",
         url: "",
         limit: "9",
-        ext: [],
+        ext: ["png","jpg"],
+        data:{},
         success: function() {},
         loadend: function() {},
         error: function() {}
     };
     this.options = Init.extend(this.options, options);
     this.el = document.getElementById(this.options.el);
+    this.imgList = null;
+    this.id = "";
     if (this.el) {
+
         this._init();
+    } else {
+        throw new Error("未指定el.");
     }
 }
 Webupload.prototype = {
     _init: function() {
+        this._correctExt();
+        this._generateID();
+        this._renderDOM();
+        this.el = document.getElementById(this.options.el);
+        this.imgList = document.getElementById(this.id).querySelector('.webupload-list');
         this._watch();
     },
     _renderDOM: function() {
-        //
+        var ul = document.createElement("ul");
+        ul.className = "webupload-list";
+        this.el.outerHTML = '<div class="webupload" id="'+this.id+'">\
+            <div class="webupload-handle">'+this.el.outerHTML+'</div>'+ul.outerHTML+'</div>';
+    },
+    //生成id
+    _generateID:function(){
+        webuploadID ++;
+        this.id = 'webupload'+webuploadID
+    },
+    //矫正后缀
+    _correctExt: function(){
+        var exts = this.options.ext,
+            extsLength = exts.length;
+        for (var i = 0; i < extsLength; i++) {
+            if (exts[i] == "jpg") {
+                exts[i] = "jpeg";
+                break;
+            }
+        }
+    },
+    _loadend:function(result,name){
+        var li = document.createElement("li"),
+            img = document.createElement("img");
+        img.src = result;
+        li.appendChild(img);
+        this.imgList.appendChild(li);
+        this.options.loadend(result, name);
     },
     _watch: function() {
         var self = this;
-        var data = new FormData();
+        
         var needVerify = self.options.ext.length > 0 ? true : false;
         this.el.addEventListener("change", function(event) {
             var i = 0,
@@ -37,6 +75,7 @@ Webupload.prototype = {
                 return;
             }
             for (; i < len; i++) {
+                var data = new FormData();
                 file = this.files[i];
                 if (needVerify && !self._filterType(this.files[i])) {
                     break;
@@ -44,13 +83,14 @@ Webupload.prototype = {
                 if (window.FileReader) {
                     reader = new FileReader();
                     reader.onloadend = function(e) {
-                        self.options.loadend(e.target.result, file.name);
+                        self._loadend(e.target.result, file.name)
                     };
                     reader.readAsDataURL(file);
                 }
                 data.append("images", file, file.name);
+                self._upload(data);
             }
-            self._upload(data);
+            
 
         }, false);
     },
@@ -59,13 +99,13 @@ Webupload.prototype = {
             extsLength = exts.length,
             isMatch = false;
         for (var i = 0; i < extsLength; i++) {
-            if (file.type.indexOf(exts[j]) > -1) {
+            if (file.type.indexOf(exts[i]) > -1) {
                 isMatch = true;
                 break;
             }
         }
         if (!isMatch) {
-            self.options.error("文件格式不正确");
+            this.options.error("文件格式不正确");
         }
         return isMatch;
     },
@@ -88,12 +128,14 @@ Webupload.prototype = {
     _onprogress: function(e) {
         //var divStatus = document.getElementById("status");
         if (event.lengthComputable) {
-            console.log((event.loaded / event.total) * event.loaded / event.total * 100 + "%")
+            console.log((event.loaded / event.total) * 100 + "%")
         }
     },
+    //设置额外数据
     _setExtraData: function(data) {
         var extraData = this.options.data;
         if (typeof(extraData) == "object") {
+            var key;
             for (key in extraData) {
                 data.append(key, extraData[key])
             }
@@ -101,3 +143,4 @@ Webupload.prototype = {
     }
 }
 window.Webupload = Webupload;
+export default Webupload;

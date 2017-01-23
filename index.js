@@ -1,1 +1,2 @@
-module.exports = require("./src/webupload.js");
+import Webupload from './src/webupload'
+export {Webupload};
