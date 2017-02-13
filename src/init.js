@@ -69,3 +69,11 @@ exports.ajax = function ajax(options) {
         xhr.send(null);
     }
 }
+exports.getStyle = function(elem, style) {
+    // 主流浏览器
+    if (window.getComputedStyle) {
+        return window.getComputedStyle(elem, null)[style];
+    } else {
+        return elem.currentStyle[style]
+    }
+}

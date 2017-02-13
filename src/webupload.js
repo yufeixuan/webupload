@@ -1,4 +1,4 @@
-var Init = require("./init.js");
+var IW = require("./init.js");
 require("./formData.js");
 var webuploadID = 0;
 function Webupload(options) {
@@ -7,41 +7,57 @@ function Webupload(options) {
         url: "",
         limit: "9",
         ext: ["png","jpg"],
-        data:{},
+        auto: true,
+        data:[],
         success: function() {},
+        finish: function() {},
         loadend: function() {},
         error: function() {}
     };
-    this.options = Init.extend(this.options, options);
+    this.options = IW.extend(this.options, options);
     this.el = document.getElementById(this.options.el);
     this.imgList = null;
     this.id = "";
+    this.data = [];
     if (this.el) {
-
         this._init();
     } else {
         throw new Error("未指定el.");
     }
 }
+
 Webupload.prototype = {
     _init: function() {
+        this.data = [];
+        this.count = 0;
         this._correctExt();
         this._generateID();
         this._renderDOM();
         this.el = document.getElementById(this.options.el);
-        this.imgList = document.getElementById(this.id).querySelector('.webupload-list');
+        this.imgList = document.getElementById("webupload"+this.id).querySelector('.webupload-list');
+        this.btn = document.getElementById("webupload"+this.id).querySelector('.webupload-btn');
         this._watch();
     },
     _renderDOM: function() {
+        var self = this;
         var ul = document.createElement("ul");
         ul.className = "webupload-list";
-        this.el.outerHTML = '<div class="webupload" id="'+this.id+'">\
-            <div class="webupload-handle">'+this.el.outerHTML+'</div>'+ul.outerHTML+'</div>';
+        var width = 0;
+        var height = 0;
+        ["width","paddingLeft","paddingRight","borderLeft","borderRight"].forEach(function(value,index,array){
+            width += IW.getStyle(self.el,value)?parseFloat(IW.getStyle(self.el,value)):0
+        });
+        ["height","paddingTop","paddingBottom","borderTop","borderBottom"].forEach(function(value,index,array){
+            height += IW.getStyle(self.el,value)?parseFloat(IW.getStyle(self.el,value)):0
+        });
+        width = width == 0? "auto": width+"px";
+        height = height == 0? "auto": height+"px";
+        this.el.outerHTML = '<div class="webupload" id="webupload'+this.id+'"><div class="webupload-handle" style="position:relative; z-index:1; width:'+width+'; height:'+height+'; overflow:hidden;">'+this.el.outerHTML+'<input class="webupload-btn" type="file" name="images" multiple="multiple" style="position:absolute;z-index:1;left:-80px;;top:0; bottom:0; right:0; opacity:0;cursor:pointer;"></div>'+ul.outerHTML+'</div>';
     },
     //生成id
     _generateID:function(){
         webuploadID ++;
-        this.id = 'webupload'+webuploadID
+        this.id = webuploadID
     },
     //矫正后缀
     _correctExt: function(){
@@ -64,9 +80,8 @@ Webupload.prototype = {
     },
     _watch: function() {
         var self = this;
-        
         var needVerify = self.options.ext.length > 0 ? true : false;
-        this.el.addEventListener("change", function(event) {
+        this.btn.addEventListener("change", function(event) {
             var i = 0,
                 len = this.files.length,
                 img, reader, file;
@@ -74,9 +89,13 @@ Webupload.prototype = {
                 self.options.error("最多上传" + self.options.limit + "个文件");
                 return;
             }
+            self.data = [];
+            self.count = 0;
             for (; i < len; i++) {
-                var data = new FormData();
                 file = this.files[i];
+                var data = new FormData();
+                data.append("images", file, file.name);
+                self.data.push(data);
                 if (needVerify && !self._filterType(this.files[i])) {
                     break;
                 };
@@ -87,10 +106,10 @@ Webupload.prototype = {
                     };
                     reader.readAsDataURL(file);
                 }
-                data.append("images", file, file.name);
-                self._upload(data);
             }
-            
+            if (self.options.auto) {
+                self.upload();
+            }
 
         }, false);
     },
@@ -111,8 +130,22 @@ Webupload.prototype = {
     },
     _upload: function(data) {
         //var sBoundary = "---------------------------" + Date.now().toString(16);
+        var self = this;
         this._setExtraData(data);
         var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    self.count ++;
+                    self.options.success(self.count,self.data.length);
+                    if (self.count == self.data.length) {
+                        self.options.finish();
+                    }
+                } else {
+                    self.options.error(xhr.status)
+                }
+            }
+        };
         xhr.open('POST', this.options.url, true);
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -139,6 +172,13 @@ Webupload.prototype = {
             for (key in extraData) {
                 data.append(key, extraData[key])
             }
+        }
+    },
+    upload:function(){
+        var i = 0,
+            len = this.data.length;
+        for (; i < len; i++) {
+            this._upload(this.data[i]);
         }
     }
 }
