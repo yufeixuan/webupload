@@ -28,6 +28,7 @@ app.use(express.static('demo'));
 
 app.post('/api/upload', upload.array('images'), function(req, res, next) {
     console.log(req.body);
+    res.header("Access-Control-Allow-Origin", "*");  
     res.json({
         data: req.files
     })

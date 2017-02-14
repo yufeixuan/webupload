@@ -36,6 +36,7 @@ Webupload.prototype = {
         this.el = document.getElementById(this.options.el);
         this.imgList = document.getElementById("webupload"+this.id).querySelector('.webupload-list');
         this.btn = document.getElementById("webupload"+this.id).querySelector('.webupload-btn');
+        this._bindDeleteHanlde();
         this._watch();
     },
     _renderDOM: function() {
@@ -53,6 +54,18 @@ Webupload.prototype = {
         width = width == 0? "auto": width+"px";
         height = height == 0? "auto": height+"px";
         this.el.outerHTML = '<div class="webupload" id="webupload'+this.id+'"><div class="webupload-handle" style="position:relative; z-index:1; width:'+width+'; height:'+height+'; overflow:hidden;">'+this.el.outerHTML+'<input class="webupload-btn" type="file" name="images" multiple="multiple" style="position:absolute;z-index:1;left:-80px;;top:0; bottom:0; right:0; opacity:0;cursor:pointer;"></div>'+ul.outerHTML+'</div>';
+    },
+    _bindDeleteHanlde: function(){
+        var self = this;
+        IW.event.addHandler(this.imgList,"click",function(e){
+            var ele = IW.event.getTarget(e);
+            if (ele.className == "webupload-item-delete") {
+                var parent = ele.parentNode;
+                var index = Array.prototype.slice.call(self.imgList.querySelectorAll("li")).indexOf(parent);
+                parent.parentNode.removeChild(parent);
+                self.data.splice(index,1);
+            }
+        });
     },
     //生成id
     _generateID:function(){
@@ -72,9 +85,22 @@ Webupload.prototype = {
     },
     _loadend:function(result,name){
         var li = document.createElement("li"),
-            img = document.createElement("img");
+            img = document.createElement("img"),
+            span = document.createElement("span"),
+            deleteBtn = document.createElement("i");
         img.src = result;
+        img.className = "webupload-item";
+        li.style.position = "relative";
         li.appendChild(img);
+        span.className = "webupload-item-progress";
+        span.style.position = "absolute";
+        span.style.transition = "width 0.5s";
+        span.style.opacity = "0.5";
+        span.style.width = "0";
+        li.appendChild(span);
+        deleteBtn.className = "webupload-item-delete";
+        deleteBtn.style.position = "absolute";
+        li.appendChild(deleteBtn);
         this.imgList.appendChild(li);
         this.options.loadend(result, name);
     },
@@ -128,7 +154,7 @@ Webupload.prototype = {
         }
         return isMatch;
     },
-    _upload: function(data) {
+    _upload: function(data,index) {
         //var sBoundary = "---------------------------" + Date.now().toString(16);
         var self = this;
         this._setExtraData(data);
@@ -150,7 +176,15 @@ Webupload.prototype = {
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         //xhr.onprogress = this._onprogress;
-        xhr.upload.onprogress = this._onprogress;
+        xhr.upload.onprogress = function(e){
+            //var divStatus = document.getElementById("status");
+            console.log(index)
+            if (event.lengthComputable) {
+                var percentage = (event.loaded / event.total) * 100 + "%"
+                self.imgList.querySelectorAll("li")[index].querySelector(".webupload-item-progress").style.width=percentage
+                //console.log((event.loaded / event.total) * 100 + "%")
+            }
+        };
         if (data.fake) {
             xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + data.boundary);
             xhr.sendAsBinary(data.toString());
@@ -158,12 +192,12 @@ Webupload.prototype = {
             xhr.send(data);
         }
     },
-    _onprogress: function(e) {
-        //var divStatus = document.getElementById("status");
-        if (event.lengthComputable) {
-            console.log((event.loaded / event.total) * 100 + "%")
-        }
-    },
+    // _onprogress: function(e) {
+    //     //var divStatus = document.getElementById("status");
+    //     if (event.lengthComputable) {
+    //         console.log((event.loaded / event.total) * 100 + "%")
+    //     }
+    // },
     //设置额外数据
     _setExtraData: function(data) {
         var extraData = this.options.data;
@@ -178,7 +212,7 @@ Webupload.prototype = {
         var i = 0,
             len = this.data.length;
         for (; i < len; i++) {
-            this._upload(this.data[i]);
+            this._upload(this.data[i],i);
         }
     }
 }

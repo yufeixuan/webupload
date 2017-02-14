@@ -14,7 +14,7 @@ IE 9 +
 * 上传进度
 * 文件类型限制
 * 可选自动上传
-* <del>删除</del>
+* 删除
 * <del>裁剪</del>
 * 跨域
 * <del>断点续传</del>
@@ -100,3 +100,4 @@ btn.onclick = function(){
 
     npm run server
 
+在浏览器中打开`http://localhost:3000 `
