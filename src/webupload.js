@@ -25,6 +25,7 @@ function Webupload(options) {
     this.imgList = null;
     this.id = "";
     this.data = [];
+    this.count = 0;
     if (this.el) {
         this._init();
     } else {
@@ -34,8 +35,6 @@ function Webupload(options) {
 
 Webupload.prototype = {
     _init: function() {
-        this.data = [];
-        this.count = 0;
         this._correctExt();
         this._generateID();
         this._renderDOM();
@@ -143,7 +142,10 @@ Webupload.prototype = {
             }
             for (; i < len; i++) {
                 file = this.files[i];
-                
+                if (self.data.length >= self.options.limit) {
+                    self.options.error("最多上传" + self.options.limit + "个文件");
+                    break;
+                }
                 if (needVerify && !self._filterType(file)) {
                     self.options.error("文件" + file.name + "类型错误");
                     break;
@@ -195,6 +197,7 @@ Webupload.prototype = {
         var self = this;
         this._setExtraData(data);
         var xhr = new XMLHttpRequest();
+        console.log(xhr)
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
@@ -249,7 +252,7 @@ Webupload.prototype = {
     upload:function(){
         var i = 0,
             len = this.data.length;
-        if (len=0) {return};
+        if (len==0) {return};
         this.options.startUpload();
         this.btn.disabled = true;
         this.el.classList.add("disabled");

@@ -5,7 +5,7 @@
 .webupload-list li img { width: 80px; vertical-align: middle; }
 .webupload-item-delete { top:-9px; right:-9px; width:18px; height:18px; border-radius:9px; background:red; cursor:pointer; }
 .webupload-item-delete:after { position:absolute; left:4px; top:8px; width:10px; height:2px; background:#fff; overflow:hidden; content:""; }
-.webupload-item-progress { left:0; bottom:10px; height:10px; background:#006dcc;}
+.webupload-item-progress { left:0; top:50px; height:10px; background:#006dcc;}
 .webupload-item-size { padding-top:5px; text-align:center; font-size:12px; line-height:1; }
 .webupload-item-name { padding-top:5px; text-align:center; font-size:12px; line-height:1; }
 .webupload-item-error { padding-top:5px; text-align:center; font-size:12px; line-height:1; color:red; }
