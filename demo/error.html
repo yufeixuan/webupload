@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>手动上传</title>
+    <title>error</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="webupload.css">
 </head>
@@ -13,31 +13,30 @@
         <h1>Upload Your Images</h1>
         <div id="upload" class="upload">选择图片</div>
         <button id="btn">上传</button>
+        <div id="error" style="color:red;"></div>
     </div>
 
     <script src="build/webupload.js"></script>
     <script>
+    //错误处理
     var btn = document.getElementById("btn");
     var demo = new Webupload({
+        //触发上传的元素
         el: "upload",
+        //上传地址
         url: "/api/upload",
         auto: false,
-        showName: true,
-        showSize: true,
-        loadend: function(source, file) {
-            //console.log(source)
-            console.log(file)
+        maxSize:30,
+        //选择文件按钮发生change时（可选）
+        change:function(){
+            document.getElementById("error").innerHTML="";
         },
-        //上传开始（可选）
-        startUpload:function(){
-            btn.disabled = true;
-        },
-        //完成上传动作（可选）
-        finishUpload:function(){
-            btn.disabled = false;
+        //错误处理消息（可选）
+        error:function(msg){
+            document.getElementById("error").innerHTML=msg;
         }
     });
-    //手动触发上传
+
     btn.onclick = function(){
         demo.upload();
     }

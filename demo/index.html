@@ -40,9 +40,9 @@
         //选择文件后自动上传（可选）
         auto: true,
         //单个文件装载完成（可选）
-        loadend: function(source, b) {
+        loadend: function(source, file) {
             //console.log(source)
-            console.log(b)
+            console.log(file)
         },
         //文件上传成功触发（可选）
         success:function(i,len){

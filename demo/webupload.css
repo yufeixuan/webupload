@@ -1,8 +1,12 @@
 .upload { display:inline-block; width:100px; padding:8px 0; line-height:1; text-align:center; background:#006dcc; background-image:linear-gradient(to bottom,#08c,#04c); border:1px solid #ccc; border-color:rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25); box-shadow:inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05); color:#fff; cursor:pointer; border-radius:4px; }
+.upload.disabled { background:#bbb; cursor:default; }
 .webupload-list { overflow:hidden; zoom:1; list-style:none; margin:0; padding:10px 0; }
 .webupload-list li { float:left; background: #fff; border: 1px solid #ccc; text-align:center; padding:5px; margin:5px 10px 5px 0; }
 .webupload-list li img { width: 80px; vertical-align: middle; }
 .webupload-item-delete { top:-9px; right:-9px; width:18px; height:18px; border-radius:9px; background:red; cursor:pointer; }
 .webupload-item-delete:after { position:absolute; left:4px; top:8px; width:10px; height:2px; background:#fff; overflow:hidden; content:""; }
 .webupload-item-progress { left:0; bottom:10px; height:10px; background:#006dcc;}
+.webupload-item-size { padding-top:5px; text-align:center; font-size:12px; line-height:1; }
+.webupload-item-name { padding-top:5px; text-align:center; font-size:12px; line-height:1; }
+.webupload-item-error { padding-top:5px; text-align:center; font-size:12px; line-height:1; color:red; }
 

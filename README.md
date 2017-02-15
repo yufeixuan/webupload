@@ -13,8 +13,14 @@ IE 9 +
 * 上传预览
 * 上传进度
 * 文件类型限制
+* 文件大小限制
 * 可选自动上传
+* 是否显示文件大小
+* 是否显示文件名称
+* 错误处理
 * 删除
+* <del>清空已选择的文件</del>
+* <del>拖放上传(不可删除)</del>
 * <del>裁剪</del>
 * 跨域
 * <del>断点续传</del>
@@ -45,28 +51,28 @@ new Webupload({
     },
     //限制上传个数（可选，默认最多上传9个文件）
     limit: 2,
+    //限制文件尺寸（单位kb，可选）
+    maxSize:10,
     //限制上传类型（可选）
     ext: ["png"],
+    //是否自动上传？默认自动（可选）
+    auto: true,
+    //显示文件名（可选）
+    showName: true,
+    //显示文件大小（可选）
+    showSize: true,
     //单个文件装载完成（可选）
     loadend: function(source, b) {
         //console.log(source)
         console.log(b)
     },
-    //文件上传成功触发（可选）
+    //单个文件上传成功触发（可选）
     success:function(i,len){
         console.log("成功"+(i/len*100).toFixed(0)+'%');
     },
-    //所有文件上传成功触发（可选）
-    finish:function(){
-        console.log("over")
-    },
-    //错误处理消息（可选）
-    error:function(msg){
-        console.log(msg);
-    }
 });
 ```
-### 手动触发上传
+### 手动触发上传,例如实现连续上传
 
 ```html
 <div id="upload" class="upload">选择图片</div>
@@ -74,19 +80,50 @@ new Webupload({
 ```
 
 ```js
+var btn = document.getElementById("btn");
 var demo = new Webupload({
     el: "upload",
     url: "/api/upload",
     auto: false,
-    error:function(msg){
-        console.log(msg);
+    //上传开始（可选）
+    startUpload:function(){
+        btn.disabled = true;
+    },
+    //完成上传动作（可选）
+    finishUpload:function(){
+        btn.disabled = false;
     }
 });
 //手动触发上传
-var btn = document.getElementById("btn");
 btn.onclick = function(){
     demo.upload();
 }
+```
+
+### 错误处理
+
+```html
+<div id="error" style="color:red;"></div>
+```
+
+```js
+new Webupload({
+    //触发上传的元素
+    el: "upload",
+    //上传地址
+    url: "/api/upload",
+    auto: false,
+    maxSize:30,
+    //选择文件按钮发生change时（可选）
+    change:function(){
+        document.getElementById("error").innerHTML="";
+    },
+    //错误处理消息（可选）
+    error:function(msg){
+        document.getElementById("error").innerHTML=msg;
+    }
+});
+
 ```
 
 ### 跨域 

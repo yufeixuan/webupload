@@ -1,6 +1,6 @@
 {
   "name": "webupload",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "一个简单无依赖的图片上传组建",
   "main": "index.js",
   "scripts": {
