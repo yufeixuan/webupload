@@ -1,7 +1,7 @@
 {
   "name": "webupload",
-  "version": "0.0.9",
-  "description": "一个简单无依赖的图片上传组建",
+  "version": "0.1.0",
+  "description": "一个简单无依赖的图片上传组件",
   "main": "index.js",
   "scripts": {
     "build": "webpack --watch --progress --colors",

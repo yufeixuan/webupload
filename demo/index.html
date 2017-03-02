@@ -40,16 +40,15 @@
         //选择文件后自动上传（可选）
         auto: true,
         //单个文件装载完成（可选）
-        loadend: function(source, file) {
+        loadend: function(source, fileName, fileSize) {
             //console.log(source)
-            console.log(file)
         },
         //文件上传成功触发（可选）
         success:function(i,len){
             console.log("成功"+(i/len*100).toFixed(0)+'%');
         },
         //所有文件上传成功触发（可选）
-        finish:function(){
+        finishUpload:function(){
             console.log("over")
         },
         //错误处理消息（可选）

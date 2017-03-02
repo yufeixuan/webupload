@@ -99,7 +99,15 @@ exports.event = {
             event.cancelBubble = true;
         }
     },
-    addHandler: function (element, type, handler) {
+    getPointerPositionInDocument: function (event) {
+        var x = event.pageX || (event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft));
+        var y = event.pageY || (event.clientY + (document.documentElement.scrollTop || document.body.scrollTop));
+        return {
+            "x": x,
+            "y": y
+        }
+    },
+    on: function (element, type, handler) {
         if (element.addEventListener) {
             element.addEventListener(type, handler, false);
         } else if (element.attachEvent) {
@@ -108,7 +116,7 @@ exports.event = {
             element["on" + type] = handler;
         }
     },
-    removeHandler: function (element, type, handler) {
+    off: function (element, type, handler) {
         if (element.removeEventListener) {
             element.removeEventListener(type, handler, false);
         } else if (element.detachEvent) {
